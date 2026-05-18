@@ -11,13 +11,23 @@ use App\Models\Publisher;
 class Book extends Model
 {
     use HasFactory;
-    
-    protected $fillable = ['title', 'pages', 'author_id', 'category_id', 'publisher_id', 'published_year'];
 
-    public function users()
+    protected $fillable = ['title', 'isbn', 'author_id', 'category_id', 'publisher_id'];
+
+    // CORREÇÃO: Um livro PERTENCE A um autor (no singular)
+    public function author()
     {
-        return $this->belongsToMany(User::class, 'borrowings')
-                    ->withPivot('borrowed_at', 'returned_at')
-                    ->withTimestamps();
+        return $this->belongsTo(Author::class);
+    }
+
+    // Aproveite para garantir que os outros também usem belongsTo:
+    public function category()
+    {
+        return $this->belongsTo(Category::class);
+    }
+
+    public function publisher()
+    {
+        return $this->belongsTo(Publisher::class);
     }
 }
