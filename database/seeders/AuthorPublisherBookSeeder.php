@@ -37,7 +37,7 @@ class AuthorPublisherBookSeeder extends Seeder
             'author_id' => $author->id,
             'category_id' => $category->id,
             'publisher_id' => $publisher->id,
-        ]);
-    });
-}
+            ]);
+        });
+    }
 }

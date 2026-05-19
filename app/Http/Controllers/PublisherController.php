@@ -25,6 +25,7 @@ class PublisherController extends Controller
     {
         $request->validate([
             'name' => 'required|string|unique:publishers|max:255',
+            'address' => 'nullable|string|max:255', // <-- Já estava certinho aqui!
         ]);
 
         Publisher::create($request->all());
@@ -49,6 +50,7 @@ class PublisherController extends Controller
     {
         $request->validate([
             'name' => 'required|string|unique:publishers,name,' . $publisher->id . '|max:255',
+            'address' => 'nullable|string|max:255', // <-- ADICIONADO AQUI TAMBÉM!
         ]);
 
         $publisher->update($request->all());

@@ -19,7 +19,7 @@
             <tr>
                 <th>#</th>
                 <th>Nome</th>
-                <th>Ações</th>
+                <th>Endereço</th> <th>Ações</th>
             </tr>
         </thead>
         <tbody>
@@ -27,7 +27,7 @@
                 <tr>
                     <td>{{ $loop->iteration }}</td>
                     <td>{{ $publisher->name }}</td>
-                    <td>
+                    <td>{{ $publisher->address ?? 'Não informado' }}</td> <td>
                         <a href="{{ route('publishers.show', $publisher) }}" class="btn btn-info btn-sm">
                             <i class="bi bi-eye"></i> Visualizar
                         </a>
@@ -47,8 +47,7 @@
                 </tr>
             @empty
                 <tr>
-                    <td colspan="3">Nenhuma editora encontrada.</td>
-                </tr>
+                    <td colspan="4">Nenhuma editora encontrada.</td> </tr>
             @endforelse
         </tbody>
     </table>

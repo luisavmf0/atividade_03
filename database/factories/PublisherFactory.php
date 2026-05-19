@@ -18,8 +18,8 @@ class PublisherFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => fake()->unique()->company(),
-            'address' => fake()->address()
+            'name'    => $this->faker->unique()->company(), // <-- ADICIONE O ->unique() AQUI
+            'address' => $this->faker->address(),
         ];
     }
 }

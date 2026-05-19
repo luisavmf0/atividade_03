@@ -24,6 +24,7 @@ class BookController extends Controller
             'publisher_id' => 'required|exists:publishers,id',
             'author_id' => 'required|exists:authors,id',
             'category_id' => 'required|exists:categories,id',
+            'pages'       => 'required|integer|min:1',
         ]);
 
         Book::create($request->all());
@@ -78,6 +79,7 @@ class BookController extends Controller
 
         return redirect()->route('books.index')->with('success', 'Livro atualizado com sucesso.');
     }
+    
     public function show(Book $book)
     {
         // Carregando autor, editora e categoria do livro com eager loading
@@ -92,5 +94,13 @@ class BookController extends Controller
         $books = Book::with('author')->paginate(20);
 
         return view('books.index', compact('books'));
+    }
+    
+    public function destroy($id)
+    {
+        $book = Book::findOrFail($id);
+        $book->delete();
+
+        return redirect()->route('books.index')->with('success', 'Livro excluído com sucesso.');
     }
 }

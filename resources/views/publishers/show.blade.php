@@ -11,6 +11,7 @@
         <div class="card-body">
             <p><strong>ID:</strong> {{ $publisher->id }}</p>
             <p><strong>Nome:</strong> {{ $publisher->name }}</p>
+            <p><strong>Endereço:</strong> {{ $publisher->address ?? 'Não informado' }}</p>
         </div>
     </div>
 

@@ -12,7 +12,7 @@ class Book extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['title', 'isbn', 'author_id', 'category_id', 'publisher_id'];
+    protected $fillable = ['title', 'isbn', 'author_id', 'category_id', 'publisher_id', 'pages'];
 
     // CORREÇÃO: Um livro PERTENCE A um autor (no singular)
     public function author()
