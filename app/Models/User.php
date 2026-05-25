@@ -16,7 +16,7 @@ use Illuminate\Notifications\Notifiable;
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
-    use HasApiTokens, HasFactory, Notifiable;
+    use HasFactory, Notifiable;
 
     /**
      * Get the attributes that should be cast.
@@ -33,9 +33,8 @@ class User extends Authenticatable
 
     public function books()
     {
-        // Define o relacionamento usando a tabela intermediária 'borrowings' 
         return $this->belongsToMany(Book::class, 'borrowings')
-                    ->withPivot('borrowed_at', 'returned_at') // Permite acessar as datas de empréstimo [cite: 71]
-                    ->withTimestamps(); // Mantém os campos created_at e updated_at da tabela pivô [cite: 71]
+                    ->withPivot('id', 'borrowed_at', 'returned_at')
+                    ->withTimestamps();
     }
 }
