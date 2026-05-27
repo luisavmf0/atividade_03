@@ -23,6 +23,10 @@ class BorrowingController extends Controller
 
         return redirect()->route('books.show', $book)->with('success', 'Empréstimo registrado com sucesso.');
     }
+<<<<<<< HEAD
+=======
+
+>>>>>>> 42f661f372a20e67531b87b2d98bedab3fa1e479
     public function returnBook(Borrowing $borrowing)
     {
         $borrowing->update([
@@ -31,10 +35,19 @@ class BorrowingController extends Controller
 
         return redirect()->route('books.show', $borrowing->book_id)->with('success', 'Devolução registrada com sucesso.');
     }
+<<<<<<< HEAD
+=======
+
+>>>>>>> 42f661f372a20e67531b87b2d98bedab3fa1e479
     public function userBorrowings(User $user)
     {
         $borrowings = $user->books()->withPivot('borrowed_at', 'returned_at')->get();
 
         return view('users.borrowings', compact('user', 'borrowings'));
     }
+<<<<<<< HEAD
+=======
+
+    
+>>>>>>> 42f661f372a20e67531b87b2d98bedab3fa1e479
 }

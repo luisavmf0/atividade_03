@@ -15,6 +15,7 @@ use Illuminate\Notifications\Notifiable;
 class User extends Authenticatable
 {
    
+
     use HasFactory, Notifiable;
 
     protected function casts(): array
@@ -28,7 +29,9 @@ class User extends Authenticatable
     public function books()
     {
         return $this->belongsToMany(Book::class, 'borrowings')
+
             ->withPivot('id','borrowed_at', 'returned_at')
             ->withTimestamps();
+
     }
 }

@@ -4,8 +4,15 @@
 <div class="container">
     <h1 class="my-4">Detalhes do Livro</h1>
 
-    <div class="card">
-        <div class="card-header">
+    @if(session('success'))
+        <div class="alert alert-success">{{ session('success') }}</div>
+    @endif
+    @if(session('error'))
+        <div class="alert alert-danger">{{ session('error') }}</div>
+    @endif
+
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
             <strong>Título:</strong> {{ $book->title }}
         </div>
         <div class="card-body">
@@ -35,11 +42,12 @@
                     </p>
                 </div>
             </div>
+
         </div>
     </div>
 
-    <a href="{{ route('books.index') }}" class="btn btn-secondary mt-3">
-        <i class="bi bi-arrow-left"></i> Voltar
+    <a href="{{ route('books.index') }}" class="btn btn-secondary mb-4">
+        <i class="bi bi-arrow-left"></i> Voltar para Lista de Livros
     </a>
 </div>
 @endsection
