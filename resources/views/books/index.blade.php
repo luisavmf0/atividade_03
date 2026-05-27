@@ -17,10 +17,11 @@
         <i class="bi bi-plus"></i> Adicionar Livro (Com Select)
     </a>
 
-    <table class="table table-striped">
+    <table class="table table-striped align-middle"> 
         <thead>
             <tr>
                 <th>ID</th>
+                <th>Capa</th> 
                 <th>Título</th>
                 <th>Autor</th>
                 <th>Ações</th>
@@ -30,6 +31,14 @@
             @forelse($books as $book)
                 <tr>
                     <td>{{ $book->id }}</td>
+                    
+                    <td>
+                        <img src="{{ $book->cover_image ? asset('storage/' . $book->cover_image) : asset('images/default-cover.png') }}" 
+                             alt="Capa do Livro" 
+                             class="img-thumbnail" 
+                             style="width: 60px; height: 80px; object-fit: cover;">
+                    </td>
+
                     <td>{{ $book->title }}</td>
                     <td>{{ $book->author?->name ?? 'Autor não encontrado ou removido' }}</td>
                     <td>
@@ -52,7 +61,7 @@
                 </tr>
             @empty
                 <tr>
-                    <td colspan="4">Nenhum livro encontrado.</td>
+                    <td colspan="5" class="text-center">Nenhum livro encontrado.</td>
                 </tr>
             @endforelse
         </tbody>

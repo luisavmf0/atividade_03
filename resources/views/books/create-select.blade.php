@@ -3,19 +3,24 @@
 @section('content')
 <div class="container">
     <h1 class="my-4">Adicionar Livro (Com Select)</h1>
-
-    <form action="{{ route('books.store.select') }}" method="POST">
+    
+    <form action="{{ route('books.store.select') }}" method="POST" enctype="multipart/form-data">
         @csrf
         <div class="mb-3">
             <label for="title" class="form-label">Título</label>
             <input type="text" class="form-control @error('title') is-invalid @enderror" id="title" name="title" required>
             @error('title')
-                <div class="invalid-feedback">
-                    {{ $message }}
-                </div>
+            <div class="invalid-feedback">
+                {{ $message }}
+            </div>
             @enderror
         </div>
-
+        
+        <div class="mb-3">
+            <label for="cover_image" class="form-label">Capa do Livro</label>
+            <input type="file" class="form-control" id="cover_image" name="cover_image" accept="image/*">
+        </div>
+        
         <div class="mb-3">
             <label for="publisher_id" class="form-label">Editora</label>
             <select class="form-select @error('publisher_id') is-invalid @enderror" id="publisher_id" name="publisher_id" required>
@@ -60,6 +65,7 @@
                 </div>
             @enderror
         </div>
+
 
         <button type="submit" class="btn btn-success">Salvar</button>
     </form>

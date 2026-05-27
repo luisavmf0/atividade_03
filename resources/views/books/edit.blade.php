@@ -3,18 +3,23 @@
 @section('content')
 <div class="container">
     <h1 class="my-4">Editar Livro</h1>
-
-    <form action="{{ route('books.update', $book) }}" method="POST">
+    
+    <form action="{{ route('books.update', $book->id) }}" method="POST" enctype="multipart/form-data">
         @csrf
         @method('PUT')
         <div class="mb-3">
             <label for="title" class="form-label">Título</label>
             <input type="text" class="form-control @error('title') is-invalid @enderror" id="title" name="title" value="{{ old('title', $book->title) }}" required>
             @error('title')
-                <div class="invalid-feedback">
-                    {{ $message }}
-                </div>
+            <div class="invalid-feedback">
+                {{ $message }}
+            </div>
             @enderror
+        </div>
+        
+        <div class="mb-3">
+            <label for="cover_image" class="form-label">Capa do Livro</label>
+            <input type="file" class="form-control" id="cover_image" name="cover_image" accept="image/*">
         </div>
 
         <div class="mb-3">
@@ -52,6 +57,14 @@
         </div>
 
         <div class="mb-3">
+            <label for="pages" class="form-label">Número de Páginas</label>
+            <input type="number" class="form-control @error('pages') is-invalid @enderror" id="pages" name="pages" value="{{ old('pages', $book->pages) }}" required>
+            @error('pages')
+                <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
+        </div>
+
+        <div class="mb-3">
             <label for="category_id" class="form-label">Categoria</label>
             <select class="form-select @error('category_id') is-invalid @enderror" id="category_id" name="category_id" required>
                 <option value="" disabled>Selecione uma categoria</option>
@@ -67,6 +80,7 @@
                 </div>
             @enderror
         </div>
+
 
         <button type="submit" class="btn btn-success">Atualizar</button>
         <a href="{{ route('books.index') }}" class="btn btn-secondary">Cancelar</a>

@@ -12,7 +12,7 @@ class Book extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['title', 'isbn', 'author_id', 'category_id', 'publisher_id', 'pages'];
+    protected $fillable = ['title', 'author_id', 'category_id', 'publisher_id', 'published_year', 'cover_image'];
 
     // CORREÇÃO: Um livro PERTENCE A um autor (no singular)
     public function author()
@@ -29,5 +29,12 @@ class Book extends Model
     public function publisher()
     {
         return $this->belongsTo(Publisher::class);
+    }
+    
+    public function users()
+    {
+        return $this->belongsToMany(User::class, 'borrowings')
+                    ->withPivot('id', 'borrowed_at', 'returned_at')
+                    ->withTimestamps();
     }
 }
