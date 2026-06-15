@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Book;
 use App\Models\Borrowing;
+use Illuminate\Support\Facades\DB;
 
 class BorrowingController extends Controller
 {
@@ -23,31 +24,27 @@ class BorrowingController extends Controller
 
         return redirect()->route('books.show', $book)->with('success', 'Empréstimo registrado com sucesso.');
     }
-<<<<<<< HEAD
-=======
 
->>>>>>> 42f661f372a20e67531b87b2d98bedab3fa1e479
-    public function returnBook(Borrowing $borrowing)
+    public function returnBook($id)
     {
-        $borrowing->update([
-            'returned_at' => now(),
-        ]);
+        $updated = DB::table('borrowings')
+            ->where('id', $id)
+            ->update([
+                'returned_at' => now(),
+                'updated_at' => now()
+            ]);
 
-        return redirect()->route('books.show', $borrowing->book_id)->with('success', 'Devolução registrada com sucesso.');
+        if ($updated) {
+            return redirect()->back()->with('success', 'Livro devolvido com sucesso!');
+        }
+
+        return redirect()->back()->with('error', 'Não foi possível registrar a devolução.');
     }
-<<<<<<< HEAD
-=======
-
->>>>>>> 42f661f372a20e67531b87b2d98bedab3fa1e479
+    
     public function userBorrowings(User $user)
     {
         $borrowings = $user->books()->withPivot('borrowed_at', 'returned_at')->get();
 
         return view('users.borrowings', compact('user', 'borrowings'));
     }
-<<<<<<< HEAD
-=======
-
-    
->>>>>>> 42f661f372a20e67531b87b2d98bedab3fa1e479
 }

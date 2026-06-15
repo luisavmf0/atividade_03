@@ -31,4 +31,4 @@ Route::post('/books/{book}/borrow', [BorrowingController::class, 'store'])->name
 // Rota para listar o histórico de empréstimos de um usuário
 Route::get('/users/{user}/borrowings', [BorrowingController::class, 'userBorrowings'])->name('users.borrowings');
 // Rota para registrar a devolução
-Route::patch('/borrowings/{borrowing}/return', [BorrowingController::class, 'returnBook'])->name('borrowings.return');
+Route::patch('/borrowings/{id}/return', [BorrowingController::class, 'returnBook'])->name('borrowings.return');

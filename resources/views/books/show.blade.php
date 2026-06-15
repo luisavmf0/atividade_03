@@ -42,7 +42,93 @@
                     </p>
                 </div>
             </div>
+        </div>
+    </div>
 
+    <div class="card mb-4">
+        <div class="card-header bg-secondary text-white d-flex justify-content-between align-items-center">
+            <strong>Controle e Histórico de Empréstimos</strong>
+            
+            @if($book->users()->whereNull('returned_at')->exists())
+                <span class="badge bg-danger">Indisponível (Emprestado)</span>
+            @else
+                <span class="badge bg-success">Disponível para Empréstimo</span>
+            @endif
+        </div>
+        
+        <div class="card-body">
+            @if(!$book->users()->whereNull('returned_at')->exists())
+                <div class="p-3 mb-4 bg-light border rounded">
+                    <h5 class="mb-3 text-dark">Realizar Novo Empréstimo</h5>
+                    <form action="{{ route('books.borrow', $book) }}" method="POST">
+                        @csrf
+                        <div class="row align-items-end">
+                            <div class="col-md-8 mb-3 mb-md-0">
+                                <label for="user_id" class="form-label font-weight-bold">Selecione o Usuário:</label>
+                                <select class="form-select" id="user_id" name="user_id" required>
+                                    <option value="" selected disabled>Escolha um usuário da lista...</option>
+                                    @foreach($users as $user)
+                                        <option value="{{ $user->id }}">{{ $user->name }} ({{ $user->email }})</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <button type="submit" class="btn btn-success w-100">
+                                    <i class="bi bi-journal-plus"></i> Confirmar Empréstimo
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            @endif
+
+            <h5 class="mb-3">Movimentações Recentes</h5>
+            @if($book->users->isEmpty())
+                <p class="text-muted mb-0">Nenhum registro de movimentação encontrado para este livro.</p>
+            @else
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover align-middle mb-0">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Usuário</th>
+                                <th>Data de Empréstimo</th>
+                                <th>Data de Devolução</th>
+                                <th>Ações / Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($book->users as $user)
+                                <tr>
+                                    <td><strong>{{ $user->name }}</strong><br><small class="text-muted">{{ $user->email }}</small></td>
+                                    <td>{{ \Carbon\Carbon::parse($user->pivot->borrowed_at)->format('d/m/Y H:i') }}</td>
+                                    <td>
+                                        @if($user->pivot->returned_at)
+                                            <span class="badge bg-success">
+                                                {{ \Carbon\Carbon::parse($user->pivot->returned_at)->format('d/m/Y H:i') }}
+                                            </span>
+                                        @else
+                                            <span class="badge bg-danger">Em Aberto</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        @if(is_null($user->pivot->returned_at))
+                                            <form action="{{ route('borrowings.return', $user->pivot->id) }}" method="POST">
+                                                @csrf
+                                                @method('PATCH')
+                                                <button type="submit" class="btn btn-warning btn-sm shadow-sm">
+                                                    <i class="bi bi-arrow-counterclockwise"></i> Receber Devolução
+                                                </button>
+                                            </form>
+                                        @else
+                                            <span class="text-muted text-success"><i class="bi bi-check-circle-fill"></i> Finalizado</span>
+                                        @endif
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            @endif
         </div>
     </div>
 

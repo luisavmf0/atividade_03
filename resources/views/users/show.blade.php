@@ -3,25 +3,17 @@
 @section('content')
 <div class="container">
     <h1 class="my-4">Detalhes do Usuário</h1>
-<<<<<<< HEAD
-
     <div class="card">
         <div class="card-header">
-            {{ $user->name }}
-=======
-    
+            {{ $user->name }}    
     <div class="card mb-4">
         <div class="card-header bg-primary text-white">
             <h5>{{ $user->name }}</h5>
->>>>>>> 42f661f372a20e67531b87b2d98bedab3fa1e479
         </div>
         <div class="card-body">
             <p><strong>Email:</strong> {{ $user->email }}</p>
         </div>
     </div>
-
-<<<<<<< HEAD
-=======
     <div class="card">
         <div class="card-header bg-secondary text-white">Histórico de Empréstimos</div>
         <div class="card-body">
@@ -59,8 +51,6 @@
             @endif
         </div>
     </div>
-
->>>>>>> 42f661f372a20e67531b87b2d98bedab3fa1e479
     <a href="{{ route('users.index') }}" class="btn btn-secondary mt-3">
         <i class="bi bi-arrow-left"></i> Voltar
     </a>

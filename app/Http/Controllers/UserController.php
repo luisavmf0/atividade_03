@@ -6,64 +6,38 @@ use Illuminate\Http\Request;
 use App\Models\User;
 
 class UserController extends Controller
-<<<<<<< HEAD
-    {
-        // Listar todos os usuários com paginação de 10 por página
-        public function index()
-        {
-            $users = User::paginate(10);
-            return view('users.index', compact('users'));
-        }
-
-        // Mostrar os detalhes de um usuário específico
-        public function show(User $user)
-        {
-            return view('users.show', compact('user'));
-        }
-
-        // Exibir o formulário de edição do usuário
-        public function edit(User $user)
-        {
-            return view('users.edit', compact('user'));
-        }
-
-        // Salvar as alterações do usuário no banco de dados
-        public function update(Request $request, User $user)
-        {
-            $request->validate([
-                'name' => 'required|string|max:255',
-                'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
-            ]);
-
-            $user->update($request->all());
-
-            return redirect()->route('users.index')->with('success', 'Usuário atualizado com sucesso.');
-        }
-    }
-=======
 {
+    // Listar todos os usuários com paginação de 10 por página
     public function index()
     {
-        $users = \App\Models\User::paginate(10); // Paginação para 10 usuários por página
-        return view('users.index', compact('users'));
+        $users = User::paginate(10); // Paginação para 10 usuários por página [cite: 324]
+        return view('users.index', compact('users')); // [cite: 324]
     }
 
-    public function show(\App\Models\User $user)
+    // Mostrar os detalhes de um usuário específico
+    public function show(User $user)
     {
-        return view('users.show', compact('user'));
+        return view('users.show', compact('user')); // [cite: 328]
     }
 
-    public function edit(\App\Models\User $user)
+    // Exibir o formulário de edição do usuário
+    public function edit(User $user)
     {
-        return view('users.edit', compact('user'));
+        return view('users.edit', compact('user')); // [cite: 332]
     }
 
-    public function update(Request $request, \App\Models\User $user)
+    // Salvar as alterações do usuário no banco de dados
+    public function update(Request $request, User $user)
     {
-        $user->update($request->only('name', 'email'));
+        // Validação recomendada para evitar dados nulos ou e-mails duplicados
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
+        ]);
 
-        return redirect()->route('users.index')->with('success', 'Usuário atualizado com sucesso.');
+        // Atualiza apenas os campos permitidos pela atividade 
+        $user->update($request->only('name', 'email')); // 
+
+        return redirect()->route('users.index')->with('success', 'Usuário atualizado com sucesso.'); // [cite: 337, 338]
     }
-
 }
->>>>>>> 42f661f372a20e67531b87b2d98bedab3fa1e479
