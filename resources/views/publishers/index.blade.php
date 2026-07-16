@@ -4,9 +4,12 @@
 <div class="container">
     <h1 class="my-4">Lista de Editoras</h1>
 
-    <a href="{{ route('publishers.create') }}" class="btn btn-success mb-3">
-        <i class="bi bi-plus"></i> Adicionar Editora
-    </a>
+    {{-- Apenas admin e bibliotecario podem ver o botão de adicionar editora --}}
+    @can('create', App\Models\Publisher::class)
+        <a href="{{ route('publishers.create') }}" class="btn btn-success mb-3">
+            <i class="bi bi-plus"></i> Adicionar Editora
+        </a>
+    @endcan
 
     @if(session('success'))
         <div class="alert alert-success">
@@ -19,7 +22,8 @@
             <tr>
                 <th>#</th>
                 <th>Nome</th>
-                <th>Endereço</th> <th>Ações</th>
+                <th>Endereço</th> 
+                <th>Ações</th>
             </tr>
         </thead>
         <tbody>
@@ -27,27 +31,36 @@
                 <tr>
                     <td>{{ $loop->iteration }}</td>
                     <td>{{ $publisher->name }}</td>
-                    <td>{{ $publisher->address ?? 'Não informado' }}</td> <td>
+                    <td>{{ $publisher->address ?? 'Não informado' }}</td> 
+                    <td>
+                        <!-- Botão de Visualizar - Disponível para todos -->
                         <a href="{{ route('publishers.show', $publisher) }}" class="btn btn-info btn-sm">
                             <i class="bi bi-eye"></i> Visualizar
                         </a>
 
-                        <a href="{{ route('publishers.edit', $publisher) }}" class="btn btn-primary btn-sm">
-                            <i class="bi bi-pencil"></i> Editar
-                        </a>
+                        <!-- Botão de Editar - Apenas admin e bibliotecario -->
+                        @can('update', $publisher)
+                            <a href="{{ route('publishers.edit', $publisher) }}" class="btn btn-primary btn-sm">
+                                <i class="bi bi-pencil"></i> Editar
+                            </a>
+                        @endcan
 
-                        <form action="{{ route('publishers.destroy', $publisher) }}" method="POST" style="display: inline;">
-                            @csrf
-                            @method('DELETE')
-                            <button class="btn btn-danger btn-sm" onclick="return confirm('Deseja excluir esta editora?')">
-                                <i class="bi bi-trash"></i> Excluir
-                            </button>
-                        </form>
+                        <!-- Botão de Excluir - Apenas admin -->
+                        @can('delete', $publisher)
+                            <form action="{{ route('publishers.destroy', $publisher) }}" method="POST" style="display: inline;">
+                                @csrf
+                                @method('DELETE')
+                                <button class="btn btn-danger btn-sm" onclick="return confirm('Deseja excluir esta editora?')">
+                                    <i class="bi bi-trash"></i> Excluir
+                                </button>
+                            </form>
+                        @endcan
                     </td>
                 </tr>
             @empty
                 <tr>
-                    <td colspan="4">Nenhuma editora encontrada.</td> </tr>
+                    <td colspan="4">Nenhuma editora encontrada.</td> 
+                </tr>
             @endforelse
         </tbody>
     </table>

@@ -4,9 +4,12 @@
 <div class="container">
     <h1 class="my-4">Lista de Categorias</h1>
 
-    <a href="{{ route('categories.create') }}" class="btn btn-success mb-3">
-        <i class="bi bi-plus"></i> Adicionar Categoria
-    </a>
+    {{-- Apenas admin e bibliotecario podem ver o botão de adicionar categoria --}}
+    @can('create', App\Models\Category::class)
+        <a href="{{ route('categories.create') }}" class="btn btn-success mb-3">
+            <i class="bi bi-plus"></i> Adicionar Categoria
+        </a>
+    @endcan
 
     @if(session('success'))
         <div class="alert alert-success">
@@ -28,24 +31,28 @@
                     <td>{{ $loop->iteration }}</td>
                     <td>{{ $category->name }}</td>
                     <td>
-                        <!-- Botão de Visualizar -->
+                        <!-- Botão de Visualizar - Disponível para todos -->
                         <a href="{{ route('categories.show', $category) }}" class="btn btn-info btn-sm">
                             <i class="bi bi-eye"></i> Visualizar
                         </a>
 
-                        <!-- Botão de Editar -->
-                        <a href="{{ route('categories.edit', $category) }}" class="btn btn-primary btn-sm">
-                            <i class="bi bi-pencil"></i> Editar
-                        </a>
+                        <!-- Botão de Editar - Apenas admin e bibliotecario -->
+                        @can('update', $category)
+                            <a href="{{ route('categories.edit', $category) }}" class="btn btn-primary btn-sm">
+                                <i class="bi bi-pencil"></i> Editar
+                            </a>
+                        @endcan
 
-                        <!-- Botão de Excluir -->
-                        <form action="{{ route('categories.destroy', $category) }}" method="POST" style="display: inline;">
-                            @csrf
-                            @method('DELETE')
-                            <button class="btn btn-danger btn-sm" onclick="return confirm('Deseja excluir esta categoria?')">
-                                <i class="bi bi-trash"></i> Excluir
-                            </button>
-                        </form>
+                        <!-- Botão de Excluir - Apenas admin -->
+                        @can('delete', $category)
+                            <form action="{{ route('categories.destroy', $category) }}" method="POST" style="display: inline;">
+                                @csrf
+                                @method('DELETE')
+                                <button class="btn btn-danger btn-sm" onclick="return confirm('Deseja excluir esta categoria?')">
+                                    <i class="bi bi-trash"></i> Excluir
+                                </button>
+                            </form>
+                        @endcan
                     </td>
                 </tr>
             @empty

@@ -23,12 +23,18 @@ class UserController extends Controller
     // Exibir o formulário de edição do usuário
     public function edit(User $user)
     {
-        return view('users.edit', compact('user')); // [cite: 332]
+        // Bloqueia o acesso se não for o Admin
+    $this->authorize('update', $user);
+
+    return view('users.edit', compact('user'));
     }
 
     // Salvar as alterações do usuário no banco de dados
     public function update(Request $request, User $user)
     {
+        // Bloqueia a requisição de salvamento se não for o Admin
+        $this->authorize('update', $user);
+        
         // Validação recomendada para evitar dados nulos ou e-mails duplicados
         $request->validate([
             'name' => 'required|string|max:255',

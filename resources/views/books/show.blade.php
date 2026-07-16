@@ -57,29 +57,32 @@
         </div>
         
         <div class="card-body">
-            @if(!$book->users()->whereNull('returned_at')->exists())
-                <div class="p-3 mb-4 bg-light border rounded">
-                    <h5 class="mb-3 text-dark">Realizar Novo Empréstimo</h5>
-                    <form action="{{ route('books.borrow', $book) }}" method="POST">
-                        @csrf
-                        <div class="row align-items-end">
-                            <div class="col-md-8 mb-3 mb-md-0">
-                                <label for="user_id" class="form-label font-weight-bold">Selecione o Usuário:</label>
-                                <select class="form-select" id="user_id" name="user_id" required>
-                                    <option value="" selected disabled>Escolha um usuário da lista...</option>
-                                    @foreach($users as $user)
-                                        <option value="{{ $user->id }}">{{ $user->name }} ({{ $user->email }})</option>
-                                    @endforeach
-                                </select>
+            <!-- [AJUSTE DE SEGURANÇA]: Apenas admin e bibliotecario podem ver o formulário de empréstimo -->
+            @if(auth()->user()->role !== 'cliente')
+                @if(!$book->users()->whereNull('returned_at')->exists())
+                    <div class="p-3 mb-4 bg-light border rounded">
+                        <h5 class="mb-3 text-dark">Realizar Novo Empréstimo</h5>
+                        <form action="{{ route('books.borrow', $book) }}" method="POST">
+                            @csrf
+                            <div class="row align-items-end">
+                                <div class="col-md-8 mb-3 mb-md-0">
+                                    <label for="user_id" class="form-label font-weight-bold">Selecione o Usuário:</label>
+                                    <select class="form-select" id="user_id" name="user_id" required>
+                                        <option value="" selected disabled>Escolha um usuário da lista...</option>
+                                        @foreach($users as $user)
+                                            <option value="{{ $user->id }}">{{ $user->name }} ({{ $user->email }})</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <button type="submit" class="btn btn-success w-100">
+                                        <i class="bi bi-journal-plus"></i> Confirmar Empréstimo
+                                    </button>
+                                </div>
                             </div>
-                            <div class="col-md-4">
-                                <button type="submit" class="btn btn-success w-100">
-                                    <i class="bi bi-journal-plus"></i> Confirmar Empréstimo
-                                </button>
-                            </div>
-                        </div>
-                    </form>
-                </div>
+                        </form>
+                    </div>
+                @endif
             @endif
 
             <h5 class="mb-3">Movimentações Recentes</h5>
@@ -112,13 +115,18 @@
                                     </td>
                                     <td>
                                         @if(is_null($user->pivot->returned_at))
-                                            <form action="{{ route('borrowings.return', $user->pivot->id) }}" method="POST">
-                                                @csrf
-                                                @method('PATCH')
-                                                <button type="submit" class="btn btn-warning btn-sm shadow-sm">
-                                                    <i class="bi bi-arrow-counterclockwise"></i> Receber Devolução
-                                                </button>
-                                            </form>
+                                            <!-- [AJUSTE DE SEGURANÇA]: Apenas admin e bibliotecario podem receber a devolução -->
+                                            @if(auth()->user()->role !== 'cliente')
+                                                <form action="{{ route('borrowings.return', $user->pivot->id) }}" method="POST">
+                                                    @csrf
+                                                    @method('PATCH')
+                                                    <button type="submit" class="btn btn-warning btn-sm shadow-sm">
+                                                        <i class="bi bi-arrow-counterclockwise"></i> Receber Devolução
+                                                    </button>
+                                                </form>
+                                            @else
+                                                <span class="badge bg-warning text-dark"><i class="bi bi-clock-history"></i> Com o leitor</span>
+                                            @endif
                                         @else
                                             <span class="text-muted text-success"><i class="bi bi-check-circle-fill"></i> Finalizado</span>
                                         @endif

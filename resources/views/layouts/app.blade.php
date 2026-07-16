@@ -31,11 +31,34 @@
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <!-- Left Side Of Navbar -->
                     <ul class="navbar-nav me-auto">
+                        @auth
+                            <!-- Links visíveis para usuários logados -->
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ route('books.index') }}">Livros</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ route('categories.index') }}">Categorias</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ route('publishers.index') }}">Editoras</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ route('authors.index') }}">Autores</a>
+                            </li>
 
+                            <!-- [NOVO] Apenas o Admin verá o menu de Gerenciamento de Usuários -->
+                            @if(auth()->user()->role === 'admin')
+                                <li class="nav-item">
+                                    <a class="nav-link text-danger fw-bold" href="{{ route('users.index') }}">
+                                        <i class="bi bi-people-fill"></i> Gerenciar Usuários
+                                    </a>
+                                </li>
+                            @endif
+                        @endauth
                     </ul>
 
                     <!-- Right Side Of Navbar -->
-                    <ul class="navbar-nav ms-auto">
+                    <ul class="navbar-nav ms-auto align-items-center">
                         <!-- Authentication Links -->
                         @guest
                             @if (Route::has('login'))
@@ -50,9 +73,10 @@
                                 </li>
                             @endif
                         @else
-                            <li class="nav-item dropdown">
+                            <!-- [AJUSTE] Nome do usuário logado -->
+                            <li class="nav-item dropdown me-2">
                                 <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
-                                    {{ Auth::user()->name }}
+                                    {{ Auth::user()->name }} <span class="badge bg-secondary text-capitalize">{{ Auth::user()->role }}</span>
                                 </a>
 
                                 <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
@@ -61,11 +85,17 @@
                                                      document.getElementById('logout-form').submit();">
                                         {{ __('Logout') }}
                                     </a>
-
-                                    <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
-                                        @csrf
-                                    </form>
                                 </div>
+                            </li>
+
+                            <!-- [NOVO] Botão de Logout de Emergência (Se o dropdown travar, este botão salva você!) -->
+                            <li class="nav-item">
+                                <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-inline">
+                                    @csrf
+                                    <button type="submit" class="btn btn-outline-danger btn-sm">
+                                        <i class="bi bi-box-arrow-right"></i> Sair
+                                    </button>
+                                </form>
                             </li>
                         @endguest
                     </ul>

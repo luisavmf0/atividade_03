@@ -4,6 +4,8 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Facades\Gate;
+use App\Models\User;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -21,5 +23,11 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Paginator::useBootstrap();
+        // Se for admin, ignora as regras das policies e autoriza tudo
+        Gate::before(function (User $user, string $ability) {
+            if ($user->role === 'admin') {
+                return true;
+            }
+        });
     }
 }

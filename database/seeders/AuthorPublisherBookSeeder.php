@@ -26,14 +26,14 @@ class AuthorPublisherBookSeeder extends Seeder
     }
 
     // 2. Criamos os autores
-    \App\Models\Author::factory(100)->create()->each(function ($author) use ($categories) {
+    \App\Models\Author::factory(5)->create()->each(function ($author) use ($categories) {
         $publisher = \App\Models\Publisher::factory()->create();
 
         // 3. Usamos as categorias que já existem no banco (evita erro de chave estrangeira)
         $category = $categories->random();
 
         // 4. Criamos os livros
-        \App\Models\Book::factory(10)->create([
+        \App\Models\Book::factory(2)->create([
             'author_id' => $author->id,
             'category_id' => $category->id,
             'publisher_id' => $publisher->id,

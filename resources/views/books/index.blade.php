@@ -10,12 +10,15 @@
         </div>
     @endif
 
-    <a href="{{ route('books.create.id') }}" class="btn btn-success mb-3">
-        <i class="bi bi-plus"></i> Adicionar Livro (Com ID)
-    </a>
-    <a href="{{ route('books.create.select') }}" class="btn btn-primary mb-3">
-        <i class="bi bi-plus"></i> Adicionar Livro (Com Select)
-    </a>
+    {{-- Apenas admin e bibliotecario verão os botões de adicionar --}}
+    @can('create', App\Models\Book::class)
+        <a href="{{ route('books.create.id') }}" class="btn btn-success mb-3">
+            <i class="bi bi-plus"></i> Adicionar Livro (Com ID)
+        </a>
+        <a href="{{ route('books.create.select') }}" class="btn btn-primary mb-3">
+            <i class="bi bi-plus"></i> Adicionar Livro (Com Select)
+        </a>
+    @endcan
 
     <table class="table table-striped align-middle"> 
         <thead>
@@ -42,21 +45,28 @@
                     <td>{{ $book->title }}</td>
                     <td>{{ $book->author?->name ?? 'Autor não encontrado ou removido' }}</td>
                     <td>
+                        {{-- Disponível para todos --}}
                         <a href="{{ route('books.show', $book->id) }}" class="btn btn-info btn-sm">
                             <i class="bi bi-eye"></i> Visualizar
                         </a>
 
-                        <a href="{{ route('books.edit', $book->id) }}" class="btn btn-primary btn-sm">
-                            <i class="bi bi-pencil"></i> Editar
-                        </a>
+                        {{-- Apenas admin e bibliotecario verão o botão de Editar --}}
+                        @can('update', $book)
+                            <a href="{{ route('books.edit', $book->id) }}" class="btn btn-primary btn-sm">
+                                <i class="bi bi-pencil"></i> Editar
+                            </a>
+                        @endcan
 
-                        <form action="{{ route('books.destroy', $book->id) }}" method="POST" style="display: inline;">
-                            @csrf
-                            @method('DELETE')
-                            <button class="btn btn-danger btn-sm" onclick="return confirm('Deseja excluir este livro?')">
-                                <i class="bi bi-trash"></i> Deletar
-                            </button>
-                        </form>
+                        {{-- Apenas admin e bibliotecario verão o botão de Deletar --}}
+                        @can('delete', $book)
+                            <form action="{{ route('books.destroy', $book->id) }}" method="POST" style="display: inline;">
+                                @csrf
+                                @method('DELETE')
+                                <button class="btn btn-danger btn-sm" onclick="return confirm('Deseja excluir este livro?')">
+                                    <i class="bi bi-trash"></i> Deletar
+                                </button>
+                            </form>
+                        @endcan
                     </td>
                 </tr>
             @empty

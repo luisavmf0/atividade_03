@@ -32,3 +32,9 @@ Route::post('/books/{book}/borrow', [BorrowingController::class, 'store'])->name
 Route::get('/users/{user}/borrowings', [BorrowingController::class, 'userBorrowings'])->name('users.borrowings');
 // Rota para registrar a devolução
 Route::patch('/borrowings/{id}/return', [BorrowingController::class, 'returnBook'])->name('borrowings.return');
+// Apenas o admin pode acessar a rota que edita papéis de usuários
+
+Route::middleware(['auth', 'role:admin'])->group(function () {
+    Route::get('/usuarios', [UserController::class, 'index'])->name('users.index');
+    Route::put('/usuarios/{user}/role', [UserController::class, 'updateRole'])->name('users.updateRole');
+});
