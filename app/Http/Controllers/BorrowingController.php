@@ -17,23 +17,32 @@ class BorrowingController extends Controller
             abort(403, 'Acesso não autorizado.');
         }
 
-        // [ATIVIDADE 8] - Validação solicitada pelo professor Alexandre:
-        // Verifica se já existe um empréstimo em aberto (returned_at é nulo) para ESTE livro na tabela borrowings
+        // Validação padrão do formulário (precisa ser feita primeiro para garantir que temos o 'user_id' válido)
+        $request->validate([
+            'user_id' => 'required|exists:users,id',
+        ]);
+
+        // [ATIVIDADE 8] - Verifica se o LIVRO já está emprestado para alguém
         $temEmprestimoEmAberto = Borrowing::where('book_id', $book->id)
                                           ->whereNull('returned_at')
                                           ->exists();
 
         if ($temEmprestimoEmAberto) {
-            // Se o livro já estiver com alguém, bloqueia e redireciona de volta com erro
             return redirect()->back()->with('error', 'Este livro já possui um empréstimo em aberto e não pode ser emprestado novamente!');
         }
 
-        // Validação padrão do formulário
-        $request->validate([
-            'user_id' => 'required|exists:users,id',
-        ]);
+        // [ATIVIDADE 9] - Validação de limite de empréstimos por usuário:
+        // Conta quantos empréstimos ativos (returned_at é nulo) o leitor selecionado já possui
+        $quantidadeEmprestimosAtivos = Borrowing::where('user_id', $request->user_id)
+                                                ->whereNull('returned_at')
+                                                ->count();
 
-        // Cria o registro do empréstimo na tabela borrowings
+        if ($quantidadeEmprestimosAtivos >= 5) {
+            // Se já tiver 5 ou mais livros com ele, bloqueia o novo empréstimo
+            return redirect()->back()->with('error', 'Este usuário já possui o limite máximo de 5 livros emprestados simultaneamente!');
+        }
+
+        // Se passar em todas as validações, cria o registro do empréstimo na tabela borrowings
         Borrowing::create([
             'user_id' => $request->user_id,
             'book_id' => $book->id,
