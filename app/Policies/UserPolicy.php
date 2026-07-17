@@ -20,9 +20,10 @@ class UserPolicy
     /**
      * Qualquer outra role (bibliotecario ou cliente) terá o acesso negado por padrão.
      */
-    public function viewAny(User $user): bool
+    public function viewAny(User $user)
     {
-        return false; 
+        // Permite que administradores E bibliotecários vejam a lista de usuários
+        return in_array($user->role, ['admin', 'bibliotecario']);
     }
 
     public function update(User $user, User $model): bool

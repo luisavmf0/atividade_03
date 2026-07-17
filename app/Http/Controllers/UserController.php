@@ -10,14 +10,19 @@ class UserController extends Controller
     // Listar todos os usuários com paginação de 10 por página
     public function index()
     {
-        $users = User::paginate(10); // Paginação para 10 usuários por página [cite: 324]
-        return view('users.index', compact('users')); // [cite: 324]
+        // Garante que APENAS admin e bibliotecario possam ver a lista. Clientes são barrados.
+        if (auth()->user()?->role === 'cliente') {
+            abort(403, 'Acesso não autorizado.');
+        }
+
+        $users = User::paginate(10); // Paginação para 10 usuários por página 
+        return view('users.index', compact('users')); 
     }
 
     // Mostrar os detalhes de um usuário específico
     public function show(User $user)
     {
-        return view('users.show', compact('user')); // [cite: 328]
+        return view('users.show', compact('user')); 
     }
 
     // Exibir o formulário de edição do usuário
@@ -42,8 +47,21 @@ class UserController extends Controller
         ]);
 
         // Atualiza apenas os campos permitidos pela atividade 
-        $user->update($request->only('name', 'email')); // 
+        $user->update($request->only('name', 'email')); 
 
         return redirect()->route('users.index')->with('success', 'Usuário atualizado com sucesso.'); // [cite: 337, 338]
+    }
+
+    public function clearDebit(User $user)
+    {
+        // Segurança: Apenas quem não é cliente pode zerar multas
+        if (auth()->user()->role === 'cliente') {
+            abort(403, 'Acesso não autorizado.');
+        }
+
+        // Zera o valor do débito do usuário
+        $user->update(['debit' => 0.00]);
+
+        return redirect()->back()->with('success', "O débito do usuário {$user->name} foi zerado com sucesso!");
     }
 }

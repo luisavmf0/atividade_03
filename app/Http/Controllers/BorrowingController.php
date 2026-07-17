@@ -12,17 +12,31 @@ class BorrowingController extends Controller
 {
     public function store(Request $request, Book $book)
     {
-        // 1. Segurança: Apenas admin ou bibliotecário podem registrar empréstimos
+            // Busca o usuário que está tentando pegar o livro
+        $user = User::findOrFail($request->user_id);
+
+        // 2. VERIFICA SE O USUÁRIO POSSUI DÉBITO
+        if ($user->debit > 0) {
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Empréstimo não permitido: este usuário possui débitos pendentes de multas!');
+        }
+        
         if (auth()->user()->role === 'cliente') {
             abort(403, 'Acesso não autorizado.');
         }
 
-        // Validação padrão do formulário (precisa ser feita primeiro para garantir que temos o 'user_id' válido)
         $request->validate([
             'user_id' => 'required|exists:users,id',
         ]);
 
-        // [ATIVIDADE 8] - Verifica se o LIVRO já está emprestado para alguém
+        // [ATIVIDADE 10] - Bloquear usuários com débitos pendentes
+        $usuario = User::find($request->user_id);
+        if ($usuario->debit > 0) {
+            return redirect()->back()->with('error', "O usuário {$usuario->name} possui um débito pendente de R$ " . number_format($usuario->debit, 2, ',', '.') . " e não pode realizar novos empréstimos!");
+        }
+
+        // [ATIVIDADE 8] - Verifica se o LIVRO já está emprestado
         $temEmprestimoEmAberto = Borrowing::where('book_id', $book->id)
                                           ->whereNull('returned_at')
                                           ->exists();
@@ -31,18 +45,15 @@ class BorrowingController extends Controller
             return redirect()->back()->with('error', 'Este livro já possui um empréstimo em aberto e não pode ser emprestado novamente!');
         }
 
-        // [ATIVIDADE 9] - Validação de limite de empréstimos por usuário:
-        // Conta quantos empréstimos ativos (returned_at é nulo) o leitor selecionado já possui
+        // [ATIVIDADE 9] - Limite de 5 empréstimos por usuário
         $quantidadeEmprestimosAtivos = Borrowing::where('user_id', $request->user_id)
                                                 ->whereNull('returned_at')
                                                 ->count();
 
         if ($quantidadeEmprestimosAtivos >= 5) {
-            // Se já tiver 5 ou mais livros com ele, bloqueia o novo empréstimo
             return redirect()->back()->with('error', 'Este usuário já possui o limite máximo de 5 livros emprestados simultaneamente!');
         }
 
-        // Se passar em todas as validações, cria o registro do empréstimo na tabela borrowings
         Borrowing::create([
             'user_id' => $request->user_id,
             'book_id' => $book->id,
@@ -54,24 +65,30 @@ class BorrowingController extends Controller
 
     public function returnBook($id)
     {
-        // 1. Segurança: Apenas admin ou bibliotecário podem receber devoluções
-        if (auth()->user()->role === 'cliente') {
-            abort(403, 'Acesso não autorizado.');
+        // Encontra o empréstimo
+        $borrowing = Borrowing::findOrFail($id);
+        
+        // Registra a data de devolução atual
+        $borrowing->returned_at = now();
+        $borrowing->save();
+
+        // 1. CALCULA A MULTA SE HOUVER ATRASO
+        $dataEmprestimo = \Carbon\Carbon::parse($borrowing->borrowed_at);
+        $diasComLivro = $dataEmprestimo->diffInDays(now());
+
+        if ($diasComLivro > 15) {
+            $diasAtraso = $diasComLivro - 15;
+            $valorMulta = $diasAtraso * 0.50;
+
+            // Atualiza o débito do usuário acumulando o valor
+            $user = $borrowing->user;
+            $user->debit += $valorMulta;
+            $user->save();
+
+            return redirect()->back()->with('success', "Livro devolvido! Atraso de {$diasAtraso} dias. Multa de R$ " . number_format($valorMulta, 2, ',', '.') . " adicionada ao usuário.");
         }
 
-        // 2. Atualiza a coluna returned_at na tabela borrowings
-        $updated = DB::table('borrowings')
-            ->where('id', $id)
-            ->update([
-                'returned_at' => now(),
-                'updated_at' => now()
-            ]);
-
-        if ($updated) {
-            return redirect()->back()->with('success', 'Livro devolvido com sucesso!');
-        }
-
-        return redirect()->back()->with('error', 'Não foi possível registrar a devolução.');
+        return redirect()->back()->with('success', 'Livro devolvido no prazo com sucesso!');
     }
     
     public function userBorrowings(User $user)

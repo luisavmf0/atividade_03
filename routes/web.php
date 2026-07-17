@@ -34,7 +34,11 @@ Route::get('/users/{user}/borrowings', [BorrowingController::class, 'userBorrowi
 Route::patch('/borrowings/{id}/return', [BorrowingController::class, 'returnBook'])->name('borrowings.return');
 // Apenas o admin pode acessar a rota que edita papéis de usuários
 
-Route::middleware(['auth', 'role:admin'])->group(function () {
-    Route::get('/usuarios', [UserController::class, 'index'])->name('users.index');
-    Route::put('/usuarios/{user}/role', [UserController::class, 'updateRole'])->name('users.updateRole');
+//  AGORA (Permite os dois papéis)
+Route::middleware(['auth', 'role:admin,bibliotecario'])->group(function () {
+    Route::resource('users', UserController::class);
+    Route::patch('/users/{user}/clear-debit', [UserController::class, 'clearDebit'])->name('users.clearDebit');
 });
+
+// Rota para zerar o débito do usuário (apenas admin/bibliotecario podem acessar)
+Route::patch('/users/{user}/clear-debit', [UserController::class, 'clearDebit'])->name('users.clearDebit');

@@ -10,7 +10,7 @@
     <title>{{ config('app.name', 'Laravel') }}</title>
 
     <!-- Fonts -->
-    <link rel="dns-prefetch" href="//fonts.bunny.net">
+    <link class="dns-prefetch" href="//fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=Nunito" rel="stylesheet">
 
     <!-- Scripts -->
@@ -46,10 +46,10 @@
                                 <a class="nav-link" href="{{ route('authors.index') }}">Autores</a>
                             </li>
 
-                            <!-- [NOVO] Apenas o Admin verá o menu de Gerenciamento de Usuários -->
-                            @if(auth()->user()->role === 'admin')
+                            <!-- [AJUSTADO] Admin e Bibliotecário agora enxergam o gerenciamento de usuários -->
+                            @if(in_array(auth()->user()->role, ['admin', 'bibliotecario']))
                                 <li class="nav-item">
-                                    <a class="nav-link text-danger fw-bold" href="{{ route('users.index') }}">
+                                    <a class="nav-link text-primary fw-bold" href="{{ route('users.index') }}">
                                         <i class="bi bi-people-fill"></i> Gerenciar Usuários
                                     </a>
                                 </li>
@@ -73,7 +73,7 @@
                                 </li>
                             @endif
                         @else
-                            <!-- [AJUSTE] Nome do usuário logado -->
+                            <!-- Nome do usuário logado -->
                             <li class="nav-item dropdown me-2">
                                 <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
                                     {{ Auth::user()->name }} <span class="badge bg-secondary text-capitalize">{{ Auth::user()->role }}</span>
@@ -88,7 +88,7 @@
                                 </div>
                             </li>
 
-                            <!-- [NOVO] Botão de Logout de Emergência (Se o dropdown travar, este botão salva você!) -->
+                            <!-- Botão de Logout de Emergência -->
                             <li class="nav-item">
                                 <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-inline">
                                     @csrf
