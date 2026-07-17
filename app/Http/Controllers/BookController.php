@@ -130,10 +130,18 @@ class BookController extends Controller
         // Carregando autor, editora e categoria do livro com eager loading
         $book->load(['author', 'publisher', 'category']);
 
-        // Carregar todos os usuários para o formulário de empréstimo
-        $users = User::all();
+        // [NOVO] Carregar os empréstimos deste livro diretamente pelo Model Borrowing,
+        // trazendo os dados do usuário junto (e ordenando pelo mais recente)
+        $historicoEmprestimos = \App\Models\Borrowing::with('user')
+                                    ->where('book_id', $book->id)
+                                    ->orderBy('created_at', 'desc')
+                                    ->get();
 
-        return view('books.show', compact('book','users'));
+        // Carrega todos os usuários para popular o select de novos empréstimos
+        $users = \App\Models\User::all();
+
+        // Passamos a nova variável $historicoEmprestimos para a View
+        return view('books.show', compact('book', 'users', 'historicoEmprestimos'));
     }
     
     public function index()

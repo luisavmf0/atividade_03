@@ -86,7 +86,7 @@
             @endif
 
             <h5 class="mb-3">Movimentações Recentes</h5>
-            @if($book->users->isEmpty())
+            @if($historicoEmprestimos->isEmpty())
                 <p class="text-muted mb-0">Nenhum registro de movimentação encontrado para este livro.</p>
             @else
                 <div class="table-responsive">
@@ -100,24 +100,29 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach($book->users as $user)
+                            @foreach($historicoEmprestimos as $emprestimo)
                                 <tr>
-                                    <td><strong>{{ $user->name }}</strong><br><small class="text-muted">{{ $user->email }}</small></td>
-                                    <td>{{ \Carbon\Carbon::parse($user->pivot->borrowed_at)->format('d/m/Y H:i') }}</td>
                                     <td>
-                                        @if($user->pivot->returned_at)
+                                        <strong>{{ $emprestimo->user->name }}</strong><br>
+                                        <small class="text-muted">{{ $emprestimo->user->email }}</small>
+                                    </td>
+                                    <td>
+                                        {{ \Carbon\Carbon::parse($emprestimo->borrowed_at)->format('d/m/Y H:i') }}
+                                    </td>
+                                    <td>
+                                        @if($emprestimo->returned_at)
                                             <span class="badge bg-success">
-                                                {{ \Carbon\Carbon::parse($user->pivot->returned_at)->format('d/m/Y H:i') }}
+                                                {{ \Carbon\Carbon::parse($emprestimo->returned_at)->format('d/m/Y H:i') }}
                                             </span>
                                         @else
                                             <span class="badge bg-danger">Em Aberto</span>
                                         @endif
                                     </td>
                                     <td>
-                                        @if(is_null($user->pivot->returned_at))
+                                        @if(is_null($emprestimo->returned_at))
                                             <!-- [AJUSTE DE SEGURANÇA]: Apenas admin e bibliotecario podem receber a devolução -->
                                             @if(auth()->user()->role !== 'cliente')
-                                                <form action="{{ route('borrowings.return', $user->pivot->id) }}" method="POST">
+                                                <form action="{{ route('borrowings.return', $emprestimo->id) }}" method="POST">
                                                     @csrf
                                                     @method('PATCH')
                                                     <button type="submit" class="btn btn-warning btn-sm shadow-sm">
